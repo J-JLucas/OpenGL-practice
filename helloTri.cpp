@@ -32,7 +32,7 @@ int main()
     return -1;
   }
 
-  // Configure GLFW for OpenGL 3.3 Core (No Immidiate Mode)
+  // Configure GLFW for OpenGL 3.3 Core (No Immediate Mode)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -59,7 +59,7 @@ int main()
   glViewport(0, 0, 800, 600);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  // define triangle geometry
+  // Define our triangle geometry
   // vertices are defined in Normalized Device Coordinates (NDC)
   // NDC is a coordinate system where the visible range is from -1 to 1,
   // centered at 0,0 OpenGL will transform these coordinates to screen
@@ -71,30 +71,10 @@ int main()
       0.0f,  0.5f,  0.0f  // top
   };
 
-  // Create Vertex Buffer Object (VBO)
-  // VBO is a buffer in GPU memory that stores vertex data
-  // VBOs are used to store vertex attributes (position, color, normal, etc)
-  // different data types requires different VBO macros
-  // The more data you send at once, the better the performance
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
-
-  // bind VBO buffer to GL_ARRAY_BUFFER target (vertex array type)
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  // copy vertex data to bound GL_ARRAY_BUFFER (our VBO buffer)
-  // 3 draw modes:
-  // GL_STATIC_DRAW: the data is set once and used many times; static objects
-  // GL_DYNAMIC_DRAW: the data will be changed a lot and used often; moving
-  // objects GL_STREAM_DRAW: the data is set only once and only used a few
-  // times; usecase? idk
-  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_verts), triangle_verts,
-               GL_STATIC_DRAW);
-
   /* SHADERS */
   // Shaders are written in GLSL (OpenGL Shading Language)
 
-  // Load shader sources
+  // Load shader source files
   std::string vertexShaderSource = loadShaderSource("../shaders/basic.vert");
   std::string fragmentShaderSource = loadShaderSource("../shaders/basic.frag");
 
@@ -128,8 +108,49 @@ int main()
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
+  // 1)
+  // Vertex Array Object (VAO)
+  // used to hold active vertix attribute configuration
+  unsigned int VAO;
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
+
+  // 2)
+  // Create Vertex Buffer Object (VBO)
+  // VBO is a buffer in GPU memory that stores vertex data
+  // VBOs are used to store vertex attributes (position, color, normal, etc)
+  // different data types requires different VBO macros
+  // The more data you send at once, the better the performance
+  unsigned int VBO;
+  glGenBuffers(1, &VBO);
+
+  // bind VBO buffer to GL_ARRAY_BUFFER target (vertex array type)
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  // copy vertex data to bound GL_ARRAY_BUFFER (our VBO buffer)
+  // 3 draw modes:
+  // GL_STATIC_DRAW: the data is set once and used many times; static objects
+  // GL_DYNAMIC_DRAW: the data will be changed a lot and used often; moving
+  // objects GL_STREAM_DRAW: the data is set only once and only used a few
+  // times; usecase? idk
+  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_verts), triangle_verts,
+               GL_STATIC_DRAW);
+
+  // 3)
+  // tell OpenGL how to interpret vertex data
+  // (this can be done in the render loop for dynamic changes)
+  // 0: attribute location (defined in the vertex shader)
+  // 3: number of components per vertex attribute ie. vec3 = 3
+  // GL_FLOAT: data type
+  // GL_FALSE: normalize data?
+  // 3 * sizeof(float): stride (space between consecutive vertex attributes)
+  // (void*)0: offset of the first component
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
   // Main Render Loop
   while (!glfwWindowShouldClose(window)) {
+
     // terminate on ESC key press
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
@@ -139,9 +160,10 @@ int main()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Render commands here
+    // draw the triangle to double buffer?
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // check for events and swap buffers
+    // check for events and swap buffers, rendering triangle to screen
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
