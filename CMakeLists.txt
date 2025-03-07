@@ -29,9 +29,17 @@ include_directories(
 
 # Create executable
 add_executable(helloTriangle helloTri.cpp)
+add_executable(colorInterpolation colorInterp.cpp)
 
 # Link libraries
 target_link_libraries(helloTriangle
+    ${OPENGL_gl_LIBRARY}
+    ${GLFW_LIBRARIES}
+    ${GLEW_LIBRARIES}
+)
+
+# Link libraries
+target_link_libraries(colorInterpolation
     ${OPENGL_gl_LIBRARY}
     ${GLFW_LIBRARIES}
     ${GLEW_LIBRARIES}

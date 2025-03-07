@@ -71,12 +71,20 @@ int main()
       0.0f,  0.5f,  0.0f  // top
   };
 
+  float triangle_colors[] = {
+      1.0f, 0.0f, 0.0f, // red
+      0.0f, 1.0f, 0.0f, // green
+      0.0f, 0.0f, 1.0f  // blue
+  };
+
   /* SHADERS */
   // Shaders are written in GLSL (OpenGL Shading Language)
 
   // Load shader source files
-  std::string vertexShaderSource = loadShaderSource("../shaders/basic.vert");
-  std::string fragmentShaderSource = loadShaderSource("../shaders/basic.frag");
+  std::string vertexShaderSource =
+      loadShaderSource("../shaders/colorInterp.vert");
+  std::string fragmentShaderSource =
+      loadShaderSource("../shaders/colorInterp.frag");
 
   const char *vertexShaderSourceC = vertexShaderSource.c_str();
   const char *fragmentShaderSourceC = fragmentShaderSource.c_str();
@@ -121,11 +129,11 @@ int main()
   // VBOs are used to store vertex attributes (position, color, normal, etc)
   // different data types requires different VBO macros
   // The more data you send at once, the better the performance
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
+  unsigned int VBO_points;
+  glGenBuffers(1, &VBO_points);
 
   // bind VBO buffer to GL_ARRAY_BUFFER target (vertex array type)
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO_points);
 
   // copy vertex data to bound GL_ARRAY_BUFFER (our VBO buffer)
   // 3 draw modes:
@@ -146,7 +154,15 @@ int main()
   // 3 * sizeof(float): stride (space between consecutive vertex attributes)
   // (void*)0: offset of the first component
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(0); // tell shader to turn on location 0 attribute
+
+  unsigned int VBO_colors;
+  glGenBuffers(1, &VBO_colors);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO_colors);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_colors), triangle_colors,
+               GL_STATIC_DRAW);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(1); // tell shader to turn on location 1 attribute
 
   // Main Render Loop
   while (!glfwWindowShouldClose(window)) {
