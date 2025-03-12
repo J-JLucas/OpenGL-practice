@@ -30,7 +30,8 @@ include_directories(
 # Create executable
 add_executable(helloTriangle helloTri.cpp)
 add_executable(colorInterpolation colorInterp.cpp)
-
+add_executable(template ogl-boiler.cpp)
+add_executable(3dCube helloCube.cpp)
 # Link libraries
 target_link_libraries(helloTriangle
     ${OPENGL_gl_LIBRARY}
@@ -40,6 +41,20 @@ target_link_libraries(helloTriangle
 
 # Link libraries
 target_link_libraries(colorInterpolation
+    ${OPENGL_gl_LIBRARY}
+    ${GLFW_LIBRARIES}
+    ${GLEW_LIBRARIES}
+)
+
+# Link libraries
+target_link_libraries(template
+    ${OPENGL_gl_LIBRARY}
+    ${GLFW_LIBRARIES}
+    ${GLEW_LIBRARIES}
+)
+
+# Link libraries
+target_link_libraries(3dCube
     ${OPENGL_gl_LIBRARY}
     ${GLFW_LIBRARIES}
     ${GLEW_LIBRARIES}
